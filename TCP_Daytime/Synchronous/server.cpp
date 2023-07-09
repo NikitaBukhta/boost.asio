@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <ctime>
 #include <inttypes.h>
@@ -29,6 +30,7 @@ int main(int argc, char **argv) {
         tcp_acceptor.accept(client_socket);
         message = make_daytime_to_string();
         boost::asio::write(client_socket, boost::asio::buffer(message), ignored_error);
+        client_socket.close();
     }
 
     return 0;

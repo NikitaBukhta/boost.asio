@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <ctime>
 #include <inttypes.h>
@@ -31,6 +32,7 @@ public:
     }
 
     void send_message(const std::string &message) {
+        std::cout << "[TCPConnection][send_message] called" << std::endl;
         boost::asio::async_write(m_socket, boost::asio::buffer(message)
             , boost::bind(&handle_write, shared_from_this(), 
                 boost::asio::placeholders::error, 
@@ -47,7 +49,7 @@ private:
     }
 
     void handle_write(const boost::system::error_code &error, uint64_t len) {
-
+        std::cout << "[TCPConnection][handle_write] called" << std::endl;
     }
 
 private:
@@ -68,6 +70,7 @@ public:
 
 private:
     void start_accept(void) {
+        std::cout << "[TCPServer][start_accept] called" << std::endl;
         TCPConnection::TCPConnectionPtr new_connection = TCPConnection::create(m_iocontext);
 
         m_acceptor.async_accept(new_connection->socket(), boost::bind(&TCPServer::handleAccept, this
@@ -78,7 +81,12 @@ private:
     }
 
     void handleAccept(TCPConnection::TCPConnectionPtr new_connection, const boost::system::error_code &error) {
-        error ? start_accept() : new_connection->send_message(make_daytime_string());
+        std::cout << "[TCPServer][handleAccept] called" << std::endl;
+        if (!error) {
+            new_connection->send_message(make_daytime_string());
+        }
+        
+        start_accept();
     }
 
 private:
@@ -88,9 +96,14 @@ private:
 };
 
 int main(int argc, char **argv) {
+
+    try{
     boost::asio::io_context iocontext;
     TCPServer tcp_server(iocontext);
     iocontext.run();
+    } catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
 
     return 0;
 }
