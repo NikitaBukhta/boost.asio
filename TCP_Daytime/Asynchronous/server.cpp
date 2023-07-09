@@ -54,7 +54,6 @@ private:
 
 private:
     boost::asio::ip::tcp::socket m_socket;
-    std::string m_message;
 };
 
 class TCPServer {
